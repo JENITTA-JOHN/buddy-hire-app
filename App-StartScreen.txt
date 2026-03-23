@@ -1,0 +1,5 @@
+If(
+    !IsBlank(Param("ID")),
+    Application_Form_Screen,
+    Home_Screen
+)

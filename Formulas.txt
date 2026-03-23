@@ -1,0 +1,44 @@
+fxAppTitle = "BuddyHire";
+fxSizeParameters = {
+    Desktop: {
+        FontSize: {
+            ScreenTitle: 22,
+            SectionTitle: 20
+        },
+        Padding: {MainContainer: 20}
+    },
+    Mobile: {
+        FontSize: {
+            ScreenTitle: 18,
+            SectionTitle: 16
+        },
+        Padding: {MainContainer: 15}
+    }
+};
+fxnavbaritems = [
+    {
+        Key: 1,
+        Icon: "Home",
+        Label: "Home",
+        IsDefaultSelected:App.ActiveScreen = Home_Screen
+    },
+    {
+        Key: 2,
+        Icon: "Person",
+        Label: "My View",
+        IsDefaultSelected: App.ActiveScreen = My_Job_Screen
+    },
+    {
+        Key: 3,
+        Icon: "Database",
+        Label: "Profile",
+        IsDefaultSelected:App.ActiveScreen= Data_Screen
+    },
+    {
+        Key: 4,
+        Icon: "AppsList",
+        Label: "Data",
+        IsDefaultSelected:App.ActiveScreen = Job_Post_Screen
+    }
+];
+ 

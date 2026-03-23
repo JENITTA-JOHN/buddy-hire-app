@@ -1,0 +1,781 @@
+Screens:
+  Job_Detail_Screen:
+    Properties:
+      OnVisible: |+
+        =If(
+          gblInitFormAction = "New",
+            ResetForm(Form1);
+            NewForm(Form1);
+            UpdateContext({ locShowForm: true });
+            // ensure global state accurate
+            Set(gblFormMode, FormMode.New);
+            Set(gblInitFormAction, ""); // clear flag
+        ,
+          gblInitFormAction = "View",
+            ResetForm(Form1);
+            ViewForm(Form1);
+            UpdateContext({ locShowForm: false });
+            Set(gblFormMode, FormMode.View);
+            Set(gblInitFormAction, "");
+        ,
+          gblInitFormAction = "Edit",
+            ResetForm(Form1);
+            EditForm(Form1);
+            UpdateContext({ locShowForm: true });
+            Set(gblFormMode, FormMode.Edit);
+            Set(gblInitFormAction, "")
+        )
+
+
+
+
+    Children:
+      - Job_Detail_Screen_Container:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(245, 245, 245, 1)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            PaddingBottom: =20
+            PaddingLeft: =20
+            PaddingRight: =20
+            Width: =Parent.Width
+          Children:
+            - Job_Detail_Screen_HeaderContainer:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  DropShadow: =DropShadow.None
+                  Fill: |+
+                    =RGBA(0,0,0,0)
+                  FillPortions: =0
+                  Height: =75
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  Width: =Parent.Width
+                Children:
+                  - lbl_2:
+                      Control: Text@0.0.51
+                      Properties:
+                        FillPortions: =1
+                        Font: =Font.'Open Sans'
+                        FontColor: =RGBA(51, 51, 51, 1)
+                        Height: =50
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        PaddingLeft: =0
+                        Size: =If(Job_Detail_Screen.Size = ScreenSize.Small,fxSizeParameters.Mobile.FontSize.ScreenTitle,fxSizeParameters.Desktop.FontSize.ScreenTitle)
+                        Text: =fxAppTitle
+                        VerticalAlign: =VerticalAlign.Middle
+                        Weight: ='TextCanvas.Weight'.Bold
+                        Width: |-
+                          =If(
+                              Job_Detail_Screen_HeaderContainer.LayoutDirection = LayoutDirection.Vertical,
+                              Parent.Width
+                          )
+                  - avt_User_2:
+                      Control: Avatar@1.0.40
+                      Properties:
+                        Appearance: ='Avatar.Appearance'.Neutral
+                        Badge: ='Avatar.Badge'.None
+                        Height: =Parent.Height
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Shape: ='Avatar.Shape'.Circular
+                        Width: =If(Job_Detail_Screen.Size = ScreenSize.Small,32,40)
+            - Job_Detail_Screen_MainContainer:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  Fill: =RGBA(255, 255, 255, 1)
+                  Height: =Parent.Height
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =10
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  PaddingBottom: =10
+                  PaddingLeft: =10
+                  PaddingRight: =10
+                  PaddingTop: =10
+                  Width: =Parent.Width
+                Children:
+                  - Detail_Title_Container:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =0.1
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        LayoutMinHeight: =50
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                      Children:
+                        - lbl_Body_Title_Template_4:
+                            Control: Text@0.0.51
+                            Properties:
+                              Align: ='TextCanvas.Align'.Start
+                              FillPortions: =1
+                              Font: =Font.'Open Sans'
+                              FontColor: =RGBA(51, 51, 51, 1)
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              PaddingLeft: =20
+                              Size: =If(Data_Screen.Size = ScreenSize.Small,fxSizeParameters.Mobile.FontSize.SectionTitle,fxSizeParameters.Desktop.FontSize.SectionTitle)
+                              Text: ="Career Opportunities"
+                              VerticalAlign: =VerticalAlign.Middle
+                              Weight: ='TextCanvas.Weight'.Semibold
+                              Width: =Parent.Width - tlb_Body_Menu_Template_1.Width
+                              Wrap: =false
+                        - tlb_Job_Detail_3:
+                            Control: Toolbar@2.0.5
+                            Properties:
+                              Height: =40
+                              Items: "=Table(\n    {\n      ItemKey: \"edit\",\n      ItemDisplayName: \"Edit\",\n      ItemIconName: \"Edit\",\n      ItemAppearance: \"Primary\",\n      ItemIconStyle: \"Regular\",\n      ItemTooltip: \"Edit this job\",\n      ItemDisabled: !(gblFormMode = FormMode.View && gblIsAdmin)\n      //ItemDisabled:!gblIsAdmin || gblFormMode = FormMode.Edit\n    },\n    {\n      ItemKey: \"save\",\n      ItemDisplayName: \"Save\",\n      ItemIconName: \"Save\",\n      ItemAppearance: \"Subtle\",\n      ItemIconStyle: \"Regular\",\n      ItemDisabled: !((gblFormMode = FormMode.New || gblFormMode = FormMode.Edit) && gal_JobPostings.Valid)\n      //ItemDisabled: !(gblFormMode = FormMode.Edit)\n    },\n    {\n      ItemKey: \"apply\",\n      ItemDisplayName: \"Apply\",\n      ItemIconName: \"Send\",\n      ItemAppearance: \"Subtle\",\n      ItemIconStyle: \"Regular\",\n      ItemDisabled: gblFormMode <> FormMode.View\n    }\n  )  \n "
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              OnSelect: "=/*Switch(\n    Self.Selected.ItemKey,\n    \n    \"edit\",\n        Set(gblFormMode, FormMode.Edit),\n\n    \n    \"save\",\n        SubmitForm(Form1);\n        Navigate(Home_Screen, ScreenTransition.Fade),\n\n    \"apply\",\n    Set(varOpenDialog1, true)\n\n)*/\n/*Switch(\n  Self.Selected.ItemKey,\n\n  \"edit\",\n    If(\n      gblIsAdmin,\n      ResetForm(Form1);\n      EditForm(Form1);\n      UpdateContext({ locShowForm: true });\n      Set(gblFormMode, FormMode.Edit)\n    ),\n\n  \"save\",\n\n    SubmitForm(Form1);\n    Navigate(Home_Screen, ScreenTransition.Fade),\n\n  \"apply\",\n    Set(varOpenDialog1, true)\n)*/\nSwitch(\n  Self.Selected.ItemKey,\n\n  \"edit\",\n    If(\n      \n      gblFormMode = FormMode.View && gblIsAdmin,\n      // prepare form for Edit\n      Set(gblFormMode, FormMode.Edit);\n      ResetForm(Form1);\n      EditForm(Form1);\n      UpdateContext({ locShowForm: true })\n    ,\n      \n      Notify(\"You do not have permission to edit this record.\", NotificationType.Warning)\n    ),\n\n  \"save\",\n   \n    If(\n      (gblFormMode = FormMode.New || gblFormMode = FormMode.Edit) && Form1.Valid,\n      SubmitForm(Form1),\n      Notify(\"Please complete required fields before saving.\", NotificationType.Error)\n    ),\n\n  \"apply\",\n    Set(varOpenDialog1, true)\n)\n\n\n"
+                              Padding: ='Toolbar.Padding'.Large
+                              Visible: =false
+                              Width: =If(Home_Screen.Size = ScreenSize.Small,Min(90,Parent.Width*0.33),320)
+                  - Job_Detail_Screen_Body_Menu:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.None
+                        FillPortions: =0.1
+                        Height: =
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        LayoutMinHeight: =50
+                        LayoutMinWidth: =Parent.Width - (Parent.PaddingBottom + Parent.PaddingTop + Parent.PaddingLeft + Parent.PaddingRight)
+                        PaddingRight: =5
+                        RadiusBottomLeft: =0
+                        RadiusBottomRight: =0
+                        RadiusTopLeft: =0
+                        RadiusTopRight: =0
+                      Children:
+                        - Breadcrumb1_4:
+                            Control: CanvasComponent
+                            ComponentName: Breadcrumb1
+                            Properties:
+                              DividerIcon: ="ChevronRight"
+                              FillPortions: =1
+                              Height: =35
+                              Items: |-
+                                =Table(
+                                    {
+                                        ItemKey: 1,
+                                        ItemDisplayName: "Dashboard",
+                                        ItemIconName: "Home",
+                                        ItemScreenName: Home_Screen,
+                                        ItemDisabled: false
+                                    },
+                                    {
+                                        ItemKey: 2,
+                                        ItemDisplayName: "Job Details",
+                                        ItemIconName: "AppsListDetail",
+                                        ItemScreenName: Job_Detail_Screen,
+                                        ItemDisabled: false
+                                    }
+                                )
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              OnSelect: |+
+                                =Navigate(LookUp(Self.Items, ItemKey=ParamItemKey).ItemScreenName)
+                              Width: =Self.AutoWidth
+                        - tlb_Job_Detail_1:
+                            Control: Toolbar@2.0.5
+                            Properties:
+                              Height: =40
+                              Items: "=Table(\n    {\n      ItemKey: \"edit\",\n      ItemDisplayName: \"Edit\",\n      ItemIconName: \"Edit\",\n      ItemAppearance: \"Primary\",\n      ItemIconStyle: \"Regular\",\n      ItemTooltip: \"Edit this job\",\n      ItemDisabled: !(gblFormMode = FormMode.View && gblIsAdmin)\n      //ItemDisabled:!gblIsAdmin || gblFormMode = FormMode.Edit\n    },\n    {\n      ItemKey: \"save\",\n      ItemDisplayName: \"Save\",\n      ItemIconName: \"Save\",\n      ItemAppearance: \"Subtle\",\n      ItemIconStyle: \"Regular\",\n      ItemDisabled: !((gblFormMode = FormMode.New || gblFormMode = FormMode.Edit) && gal_JobPostings.Valid)\n      //ItemDisabled: !(gblFormMode = FormMode.Edit)\n    },\n    {\n      ItemKey: \"apply\",\n      ItemDisplayName: \"Apply\",\n      ItemIconName: \"Send\",\n      ItemAppearance: \"Subtle\",\n      ItemIconStyle: \"Regular\",\n      ItemDisabled: gblFormMode <> FormMode.View\n    }\n  )  \n "
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              OnSelect: "=/*Switch(\n    Self.Selected.ItemKey,\n    \n    \"edit\",\n        Set(gblFormMode, FormMode.Edit),\n\n    \n    \"save\",\n        SubmitForm(Form1);\n        Navigate(Home_Screen, ScreenTransition.Fade),\n\n    \"apply\",\n    Set(varOpenDialog1, true)\n\n)*/\n/*Switch(\n  Self.Selected.ItemKey,\n\n  \"edit\",\n    If(\n      gblIsAdmin,\n      ResetForm(Form1);\n      EditForm(Form1);\n      UpdateContext({ locShowForm: true });\n      Set(gblFormMode, FormMode.Edit)\n    ),\n\n  \"save\",\n\n    SubmitForm(Form1);\n    Navigate(Home_Screen, ScreenTransition.Fade),\n\n  \"apply\",\n    Set(varOpenDialog1, true)\n)*/\nSwitch(\n  Self.Selected.ItemKey,\n\n  \"edit\",\n    If(\n      \n      gblFormMode = FormMode.View && gblIsAdmin,\n      // prepare form for Edit\n      Set(gblFormMode, FormMode.Edit);\n      ResetForm(Form1);\n      EditForm(Form1);\n      UpdateContext({ locShowForm: true }),\n      Notify(\"You do not have permission to edit this record.\", NotificationType.Warning)\n    ),\n\n  \"save\",\n   \n    If(\n      (gblFormMode = FormMode.New || gblFormMode = FormMode.Edit) && Form1.Valid,\n      SubmitForm(Form1),\n      Notify(\"Please complete required fields before saving.\", NotificationType.Error)\n    ),\n\n  \"apply\",\n    Set(varOpenDialog1, true)\n)\n\n\n"
+                              Padding: ='Toolbar.Padding'.Large
+                              Width: =If(Home_Screen.Size = ScreenSize.Small,Min(90,Parent.Width*0.33),320)
+                  - Canvas1:
+                      Control: FluidGrid@2.3.0
+                      Properties:
+                        BorderThickness: =0
+                        Height: =Parent.Height - Self.Y
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Visible: |+
+                          =!locShowForm
+
+
+                        Width: =Parent.Width
+                        Y: =//RectQuickActionBar1.Y + RectQuickActionBar1.Height
+                      Children:
+                        - DataCard:
+                            Control: DataCard@1.0.2
+                            Properties:
+                              Height: =Parent.Height - 100
+                              Width: =Parent.Width
+                              X: =0
+                              Y: =0
+                            Children:
+                              - HtmlText5:
+                                  Control: HtmlViewer@2.1.0
+                                  Properties:
+                                    DisplayMode: |+
+                                      =If(gblFormMode = FormMode.Edit, DisplayMode.Disabled, DisplayMode.Edit)
+
+                                    Height: =DataCard.Height
+                                    HtmlText: "=If(\n  IsBlank(gblSelectedJob),\n  \"<div style='font-family:Segoe UI,Arial,sans-serif;\n              padding:30px;\n              text-align:center;\n              color:#666;\n              background:#fafafa;\n              border-radius:10px;\n              box-shadow:0 2px 8px rgba(0,0,0,0.05);'>\n      <p style='font-size:18px;margin:0;'>\U0001F50E No job selected.</p>\n   </div>\",\n  \"<div style='font-family:Segoe UI,Arial,sans-serif;\n              padding:25px;\n              background:#ffffff;\n              border-radius:12px;\n              box-shadow:0 4px 12px rgba(0,0,0,0.08);\n              color:#333;\n              line-height:1.7;'> \n   \n      <!-- Job Title -->\n      <h2 style='font-size:22px;\n                 font-weight:700;\n                 margin:0 0 18px 0;\n                 color:#2a4d8c;\n                 border-bottom:2px solid #2a4d8c;\n                 padding-bottom:8px;'>\n          \" & Coalesce(gblSelectedJob.Role, \"Job Role\") & \"\n      </h2>\n      \n      <!-- Job Info Section -->\n      <div style='display:grid;\n                  grid-template-columns: 1fr 1fr;\n                  gap:12px;\n                  margin-bottom:20px;'>\n          <div style='padding:12px;\n                      background:#f7faff;\n                      border-radius:8px;'>\n              <strong>\U0001F4CD Location:</strong><br>\" & Coalesce(gblSelectedJob.'Job Location', \"Not specified\") & \"\n          </div>\n          <div style='padding:12px;\n                      background:#f7faff;\n                      border-radius:8px;'>\n              <strong>\U0001F4BC Experience:</strong><br>\" & Coalesce(gblSelectedJob.'Experience Level', \"Not specified\") & \"\n          </div>\n          <div style='padding:12px;\n                      background:#f7faff;\n                      border-radius:8px;'>\n              <strong>\U0001F393 Qualifications:</strong><br>\" & Coalesce(gblSelectedJob.Qualifications, \"Not specified\") & \"\n          </div>\n                    <div style='padding:12px;\n                      background:#f7faff;\n                      border-radius:8px;'>\n              <strong>\U0001F4C5Expire Date:</strong><br>\" & \n                If(\n                  IsBlank(gblSelectedJob.'Expire Date'),\n                  \"Not specified\",\n                  Text(gblSelectedJob.'Expire Date', \"[$-en-US]dd mmm yyyy\")\n                ) & \"\n          </div>\n\n      </div>\n\n      <!-- Job Description Section as a card -->\n      <div style='margin-top:20px;\n                  padding:15px;\n                  background:#fff8f0;\n                  border-radius:8px;\n                  border-left:6px solid #ff9800;'>\n          <h3 style='font-size:18px;\n                     font-weight:600;\n                     margin:0 0 10px 0;\n                     color:#e65100;'>\n              \U0001F4DD Job Description\n          </h3>\" &\n\n          If(\n            Left(Coalesce(gblSelectedJob.'Job Description', \"\"), 1) = \"<\",\n            Coalesce(gblSelectedJob.'Job Description', \"<p style='color:#888;'>No details provided.</p>\"),\n            \"<ul style='margin:8px 0 0 18px;\n                        padding:0;\n                        line-height:1.6;\n                        color:#444;'>\n               <li>\" &\n                 Substitute(\n                   Trim(Coalesce(gblSelectedJob.'Job Description', \"No details provided.\")),\n                   Char(10),\n                   \"</li><li>\"\n                 ) &\n            \"</li></ul>\"\n          ) &\n\n      \"</div>\n  </div>\"\n)\n"
+                                    Width: =DataCard.Width
+                  - Form1:
+                      Control: Form@2.4.4
+                      Layout: Vertical
+                      Properties:
+                        AlignInContainer: =AlignInContainer.Start
+                        DataSource: =SPList_BuddyHire_JobPostings
+                        DefaultMode: =gblFormMode
+                        Item: =gblSelectedJob
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        NumberOfColumns: =1
+                        OnSuccess: |-
+                          =Set(gblFormMode, FormMode.View);
+                          UpdateContext({ locShowForm: false });
+                          Notify("Saved", NotificationType.Success);
+                          Refresh(SPList_BuddyHire_JobPostings);
+                          Navigate(Home_Screen, ScreenTransition.Fade)
+                        Visible: =locShowForm
+                        Width: =Parent.Width - 20
+                      Children:
+                        - Role_DataCard5:
+                            Control: TypedDataCard@1.0.7
+                            Variant: TextualEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="Role"
+                              Default: =ThisItem.Role
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,Role)
+                              MaxLength: =DataSourceInfo([@SPList_BuddyHire_JobPostings], DataSourceInfo.MaxLength, Role)
+                              Required: =true
+                              Update: =DataCardValue17.Value
+                              Width: =1306
+                              WidthFit: =true
+                              X: =0
+                              Y: =0
+                            Children:
+                              - DataCardKey18:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue17:
+                                  Control: TextInput@0.0.54
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DisplayMode: =Parent.DisplayMode
+                                    Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                                    Required: =Parent.Required
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Value: =Parent.Default
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey18.Y + DataCardKey18.Height + 4
+                              - ErrorMessage16:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue17.Y + DataCardValue17.Height
+                              - StarVisible16:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey18.Y
+                        - Job Location_DataCard2:
+                            Control: TypedDataCard@1.0.7
+                            Variant: TextualEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="JobLocation"
+                              Default: =ThisItem.'Job Location'
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,'Job Location')
+                              MaxLength: =DataSourceInfo([@SPList_BuddyHire_JobPostings], DataSourceInfo.MaxLength, 'Job Location')
+                              Required: =true
+                              Update: =DataCardValue5.Value
+                              Width: =1306
+                              WidthFit: =true
+                              X: =0
+                              Y: =1
+                            Children:
+                              - DataCardKey5:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue5:
+                                  Control: TextInput@0.0.54
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DisplayMode: =Parent.DisplayMode
+                                    Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                                    Required: =Parent.Required
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Value: =Parent.Default
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey5.Y + DataCardKey5.Height + 4
+                              - ErrorMessage9:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue5.Y + DataCardValue5.Height
+                              - StarVisible9:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey5.Y
+                        - Qualifications_DataCard8:
+                            Control: TypedDataCard@1.0.7
+                            Variant: TextualEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="Qualifications"
+                              Default: =ThisItem.Qualifications
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,Qualifications)
+                              MaxLength: =DataSourceInfo([@SPList_BuddyHire_JobPostings], DataSourceInfo.MaxLength, Qualifications)
+                              Required: =false
+                              Update: =DataCardValue72.Value
+                              Width: =1334
+                              WidthFit: =true
+                              X: =0
+                              Y: =2
+                            Children:
+                              - DataCardKey67:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue72:
+                                  Control: TextInput@0.0.54
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DisplayMode: =Parent.DisplayMode
+                                    Mode: ='TextInputCanvas.Mode'.SingleLine
+                                    Required: =Parent.Required
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Value: =Parent.Default
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey67.Y + DataCardKey67.Height + 4
+                              - ErrorMessage67:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue72.Y + DataCardValue72.Height
+                              - StarVisible67:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey67.Y
+                        - Experience Level_DataCard8:
+                            Control: TypedDataCard@1.0.7
+                            Variant: TextualEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="ExperienceLevel"
+                              Default: =ThisItem.'Experience Level'
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,'Experience Level')
+                              MaxLength: =DataSourceInfo([@SPList_BuddyHire_JobPostings], DataSourceInfo.MaxLength, 'Experience Level')
+                              Required: =false
+                              Update: =DataCardValue73.Value
+                              Width: =1334
+                              WidthFit: =true
+                              X: =0
+                              Y: =3
+                            Children:
+                              - DataCardKey68:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue73:
+                                  Control: TextInput@0.0.54
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DisplayMode: =Parent.DisplayMode
+                                    Mode: ="'TextInputCanvas.Mode'.TextInputModeSingleLine"
+                                    Required: =Parent.Required
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Value: =Parent.Default
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey68.Y + DataCardKey68.Height + 4
+                              - ErrorMessage68:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue73.Y + DataCardValue73.Height
+                              - StarVisible68:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey68.Y
+                        - Roles And Responsibilities_DataCard8:
+                            Control: TypedDataCard@1.0.7
+                            Variant: TextualEdit
+                            Properties:
+                              DataField: ="RolesAndResponsibilities"
+                              Default: =ThisItem.'Job Description'
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,'Job Description')
+                              Height: =RichTextEditor1.Y+RichTextEditor1.Height+20
+                              MaxLength: =DataSourceInfo([@SPList_BuddyHire_JobPostings], DataSourceInfo.MaxLength, 'Job Description')
+                              Required: =false
+                              Update: |-
+                                =//DataCardValue74.Value
+                                RichTextEditor1.HtmlText
+                              Width: =1334
+                              WidthFit: =true
+                              X: =0
+                              Y: =4
+                            Children:
+                              - DataCardKey69:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - ErrorMessage69:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =//DataCardValue74.Y + DataCardValue74.Height
+                              - StarVisible69:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey69.Y
+                              - RichTextEditor1:
+                                  Control: RichTextEditor@2.7.0
+                                  Properties:
+                                    Default: =Parent.Default
+                                    Height: =196
+                                    Visible: |-
+                                      =//true
+                                      Form1.Mode <> FormMode.View
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =40
+                              - HtmlText1:
+                                  Control: HtmlViewer@2.1.0
+                                  Properties:
+                                    BorderColor: =RGBA(214, 221, 224, 1)
+                                    BorderStyle: =BorderStyle.Solid
+                                    BorderThickness: =1
+                                    Fill: |-
+                                      =//RGBA(255, 255, 255, 0)
+                                      RGBA(241, 241, 241, 0.01)
+                                    Height: =RichTextEditor1.Height
+                                    HtmlText: =Parent.Default
+                                    Visible: =!RichTextEditor1.Visible
+                                    Width: =RichTextEditor1.Width
+                                    X: =RichTextEditor1.X
+                                    Y: =RichTextEditor1.Y
+                        - Expires on_DataCard3:
+                            Control: TypedDataCard@1.0.7
+                            Variant: DateEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="Expireson"
+                              Default: =ThisItem.'Expire Date'
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,'Expire Date')
+                              Required: =true
+                              Update: =DataCardValue6.SelectedDate
+                              Width: =1326
+                              WidthFit: =true
+                              X: =0
+                              Y: =5
+                            Children:
+                              - DataCardKey6:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue6:
+                                  Control: DatePicker@0.0.46
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DisplayMode: =Parent.DisplayMode
+                                    EndDate: =Date(Year(Today())+100, 12, 31)
+                                    SelectedDate: =Parent.Default
+                                    StartDate: =Date(1900, 1, 1)
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey6.Y + DataCardKey6.Height + 4
+                              - ErrorMessage4:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue6.Y + DataCardValue6.Height
+                              - StarVisible4:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =30
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey6.Y
+                        - Status _DataCard1:
+                            Control: TypedDataCard@1.0.7
+                            Variant: ComboBoxEdit
+                            IsLocked: true
+                            Properties:
+                              DataField: ="Status"
+                              Default: =ThisItem.'Status '
+                              DisplayName: =DataSourceInfo([@SPList_BuddyHire_JobPostings],DataSourceInfo.DisplayName,'Status ')
+                              Required: =false
+                              Update: =DataCardValue1.Selected
+                              Width: =1306
+                              WidthFit: =true
+                              X: =0
+                              Y: =6
+                            Children:
+                              - DataCardKey1:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldName
+                                  Properties:
+                                    Height: =22
+                                    Text: =Parent.DisplayName
+                                    Weight: ='TextCanvas.Weight'.Semibold
+                                    Width: =Parent.Width - 48
+                                    Wrap: =false
+                                    X: =24
+                                    Y: =10
+                              - DataCardValue1:
+                                  Control: ComboBox@0.0.51
+                                  MetadataKey: FieldValue
+                                  Properties:
+                                    AccessibleLabel: =Parent.DisplayName
+                                    DefaultSelectedItems: =[Parent.Default]
+                                    DisplayMode: =Parent.DisplayMode
+                                    Items: =Choices([@SPList_BuddyHire_JobPostings].'Status ')
+                                    Required: =Parent.Required
+                                    ValidationState: =If(IsBlank(Parent.Error), "None", "Error")
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardKey1.Y + DataCardKey1.Height + 4
+                              - ErrorMessage1:
+                                  Control: Text@0.0.51
+                                  MetadataKey: ErrorMessage
+                                  Properties:
+                                    Height: =30
+                                    Text: =Parent.Error
+                                    Visible: =And(!IsBlank(Parent.Error), Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =Parent.Width - 48
+                                    X: =24
+                                    Y: =DataCardValue1.Y + DataCardValue1.Height
+                              - StarVisible1:
+                                  Control: Text@0.0.51
+                                  MetadataKey: FieldRequired
+                                  Properties:
+                                    Align: ='TextCanvas.Align'.Center
+                                    Height: =20
+                                    Text: ="*"
+                                    Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                                    Width: =30
+                                    Y: =DataCardKey1.Y
+      - DialogContainer:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =RGBA(0,0,0,0.3)
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Center
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutJustifyContent: =LayoutJustifyContent.Center
+            Visible: =varOpenDialog1
+            Width: =Parent.Width
+          Children:
+            - DialogContainer_Sub1:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.SetByContainer
+                  Fill: =RGBA(255, 255, 255, 1)
+                  FillPortions: =0
+                  Height: =Switch(Job_Detail_Screen.Size,1,Parent.Height,200)
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutMaxHeight: =
+                  LayoutMaxWidth: =
+                  Width: =Switch(Job_Detail_Screen.Size,1, Parent.Width,500)
+                Children:
+                  - Icon3:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        AlignInContainer: =AlignInContainer.End
+                        Icon: =Icon.CancelBadge
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        OnSelect: =Set(varOpenDialog1,false)
+                        PaddingBottom: =30
+                        PaddingRight: =2
+                        Width: =25
+                  - lbl_ques:
+                      Control: Text@0.0.51
+                      Properties:
+                        Align: ='TextCanvas.Align'.Center
+                        AlignInContainer: =AlignInContainer.Stretch
+                        Height: =52
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        Size: =22
+                        Text: |+
+                          ="What type of applicant are you ?"
+                  - DialogContainer_Sub2:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        BorderColor: =RGBA(0, 0, 0, 0)
+                        BorderStyle: =BorderStyle.None
+                        DropShadow: =DropShadow.None
+                        Height: =
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =60
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                        LayoutMaxHeight: =
+                        LayoutMaxWidth: =
+                        LayoutMinHeight: =50
+                      Children:
+                        - btn1:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              OnSelect: |-
+                                =//Navigate(Application_Form_Screen,ScreenTransition.Cover);
+                                //Set(varOpenDialog1,false);
+                                Set(gblApplicationType, "Referral");
+                                Set(gblApplicationFormMode, FormMode.New);
+                                Set(gblSelectedApplication, Blank());
+                                ResetForm('frm_Job _Appilcation');
+                                Navigate(Application_Form_Screen, ScreenTransition.Cover);
+                                Set(varOpenDialog1, false);
+                              Text: ="Referral"
+                        - btn2:
+                            Control: Button@0.0.45
+                            Properties:
+                              LayoutMaxHeight: =
+                              LayoutMaxWidth: =
+                              OnSelect: |-
+                                =//Navigate(Application_Form_Screen,ScreenTransition.Cover);
+                                //Set(varOpenDialog1,false);
+                                Set(gblApplicationType, "Self");
+                                Set(gblApplicationFormMode, FormMode.New);
+                                Set(gblSelectedApplication, Blank());
+                                ResetForm('frm_Job _Appilcation');
+                                Navigate(Application_Form_Screen, ScreenTransition.Cover);
+                                Set(varOpenDialog1, false);
+                              Text: ="Self"

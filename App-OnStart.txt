@@ -1,0 +1,62 @@
+Set(
+    gblIsAdmin,
+    !IsBlank(
+        LookUp(
+            'SPList_BuddyHire_RollBaseSecurity',
+            'Admin Role'.Email = User().Email,
+            'Admin Role'.Email
+        )
+    )
+);
+If(
+    gblIsAdmin,
+    Set(
+        gblUserRole,
+        "Admin"
+    ),
+    Set(
+        gblUserRole,
+        "User"
+    )
+);
+Set(
+    navItems,
+    Table(
+        {
+            ItemKey: 1,
+            ItemDisplayName: "Dashboard",
+            ItemIconName: "Home",
+            ItemScreen: Home_Screen,
+            ItemDisabled: false
+        },
+        {
+            ItemKey: 2,
+            ItemDisplayName: "Job Details",
+            ItemIconName: "AppsListDetail",
+            ItemScreen: Job_Detail_Screen,
+            ItemDisabled: false
+        },
+        {
+            ItemKey: 3,
+            ItemDisplayName: "Application Form",
+            ItemIconName: "DocumentBulletList",
+            ItemScreen: Application_Form_Screen,
+            ItemDisabled: false
+        }
+    )
+);
+
+If(
+    !IsBlank(Param("ID")) && IsBlank(gblSelectedApplication),
+    Set(
+        gblSelectedApplication,
+        LookUp(
+            SPList_BuddyHire_JobApplications,
+            ID = Value(Param("ID"))
+        )
+    );
+    Set(
+        gblApplicationFormMode,
+        FormMode.View
+    )
+);
